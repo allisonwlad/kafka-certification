@@ -29,29 +29,37 @@ public class ConsumerDemoGroups {
 		String bootstrapServer = "localhost:9092";
 		CountDownLatch latch = new CountDownLatch(1);
 		
-		Runnable myConsumerThread = new ConsumerThread(latch, topic, bootstrapServer, groupId);
-		Thread thread = new Thread(myConsumerThread);
+		Runnable myConsumerRunnable = new ConsumerRunnable(latch, topic, bootstrapServer, groupId);
+		
+		// start thread
+		Thread thread = new Thread(myConsumerRunnable);
 		thread.start();
 		
 		Runtime.getRuntime().addShutdownHook(new Thread(()-> {
 			logger.info("caugth shutdown hook ");
-			myConsumerThread.
+			((ConsumerRunnable) myConsumerRunnable).shutdown();
+			try {
+				latch.await();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
 		} ));
 		try {
 			latch.await();
 		} catch (InterruptedException e) {
-			logger.error("Application error "+ e);
+			logger.error("Application error ", e);
 		}finally {
 			logger.info("Application is closed");
 		}
 	}
-	public class ConsumerThread implements Runnable {
+	public class ConsumerRunnable implements Runnable {
 
 		private CountDownLatch latch;
 		private KafkaConsumer<String, String> consumer;
-		private Logger logger = LoggerFactory.getLogger(ConsumerThread.class.getName());
+		private Logger logger = LoggerFactory.getLogger(ConsumerRunnable.class.getName());
 		
-		public ConsumerThread(CountDownLatch latch, String topic, String bootstrapServer, String groupId){
+		public ConsumerRunnable(CountDownLatch latch, String topic, String bootstrapServer, String groupId){
 			this.latch=latch;
 			Properties properties = new Properties();
 			
@@ -66,8 +74,6 @@ public class ConsumerDemoGroups {
 			consumer.subscribe(Collections.singleton(topic));
 		}
 		public void run() {
-			// TODO Auto-generated method stub
-			
 			//pull new data
 			try{
 				while (true) {
