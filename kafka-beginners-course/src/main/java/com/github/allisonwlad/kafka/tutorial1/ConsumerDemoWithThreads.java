@@ -1,4 +1,4 @@
-package com.github.allisonwlad.kafka.kafka_beginners_course;
+package com.github.allisonwlad.kafka.tutorial1;
 
 import java.time.Duration;
 import java.util.Collections;
