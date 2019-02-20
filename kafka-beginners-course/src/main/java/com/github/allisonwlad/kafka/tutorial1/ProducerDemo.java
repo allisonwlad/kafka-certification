@@ -16,6 +16,7 @@ public class ProducerDemo {
 		properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 		properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 		properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+		properties.setProperty(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
 		
 		//create the producer
 		KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
