@@ -94,7 +94,7 @@ public class TwitterProducer {
 		Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
 		StatusesFilterEndpoint hosebirdEndpoint = new StatusesFilterEndpoint();
 		// Optional: set up some followings and track terms
-		List<String> terms = Lists.newArrayList("bitcoin");
+		List<String> terms = Lists.newArrayList("bitcoin","soccer","politcs");
 		hosebirdEndpoint.trackTerms(terms);
 
 		// These secrets should be read from a config file
@@ -118,10 +118,16 @@ public class TwitterProducer {
 		properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 		
 		//safe Producer
-		properties.setProperty(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
-		properties.setProperty(ProducerConfig.ACKS_CONFIG, "all");
-		properties.setProperty(ProducerConfig.RETRIES_CONFIG, Integer.toString(Integer.MAX_VALUE));
-		properties.setProperty(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5");
+		properties.setProperty(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true"); //faz o produtor receber o response do broker com todas as réplicas
+		properties.setProperty(ProducerConfig.ACKS_CONFIG, "all"); // força response das réplicas
+		properties.setProperty(ProducerConfig.RETRIES_CONFIG, Integer.toString(Integer.MAX_VALUE)); //total de retries do envio
+		properties.setProperty(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5");//quantidade request por conexão
+		
+		//configure high throughput producer
+		properties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy");//compression better relation CPU x Ratio 
+		properties.setProperty(ProducerConfig.LINGER_MS_CONFIG, "20"); // 20 miliseconds of delay
+		properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(32*1024)); //32Kb per partition of growth blocks
+		
 		//create the producer
 		KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
 		return producer;
