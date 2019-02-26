@@ -27,6 +27,7 @@ public class ConsumerDemo {
 		
 		// create the consumer
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(properties);
+	
 		
 		// subscribe the consumer
 		consumer.subscribe(Collections.singleton("first-topic"));
